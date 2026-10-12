@@ -9,8 +9,11 @@ USB session and an offline NVMe installer. It is an independent project.
 > candidate still needs a follow-up test on that laptop. Other devices have
 > not been tested; virtual-machine checks do not establish hardware support.
 >
-> **This project is currently unstable.** Apps may crash, drivers may fail, and
-> boot or installation may break. Installation changes partitions and UEFI
+> **Occasional crashes and bugs are possible.** Apps or features may crash or
+> behave unexpectedly, and stability and hardware compatibility are still
+> being tested.
+>
+> **Installation carries risks.** It changes partitions and UEFI
 > boot entries and can cause data loss or leave Googlebook or an existing OS
 > unbootable, including when using the alongside option. The erase option
 > deletes the selected drive's existing partitions. **Back up your files and
