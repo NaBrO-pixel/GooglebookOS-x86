@@ -6,6 +6,10 @@ It applies the native port adaptations locally and creates a fresh **Live /
 Install** image. You do not need our private lab or a capture of someone's USB.
 No OS image or donor binary is redistributed in this repository.
 
+The pinned OS input is Google's **ASUS Googlebook 14 (`lapis`) recovery image,
+build `16452207`**. It is the only recovery image used and tested; substituting
+another model's image is outside the validated build path.
+
 This is an experimental build path for developers and careful hardware testers.
 Physical testing is limited to the ASUS VivoBook S5602ZA. See
 [validation](VALIDATION.md) for what has actually been tested.

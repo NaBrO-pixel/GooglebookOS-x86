@@ -3,6 +3,7 @@
 | Area | Current scope |
 | --- | --- |
 | Firmware | x86_64 UEFI; Secure Boot disabled. No legacy BIOS installer. |
+| Recovery image | Only Google's ASUS Googlebook 14 `lapis` recovery, build `16452207`, has been used and tested. Other images are unvalidated. |
 | Native baseline | ASUS VivoBook S5602ZA, i5-12500H, Iris Xe, AX211. |
 | Other laptops | Experimental; disk planning is portable, hardware drivers are not universally validated. |
 | Installation target | Idle whole NVMe disk with 512-byte logical sectors. |

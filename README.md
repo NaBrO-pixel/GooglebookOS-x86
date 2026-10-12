@@ -56,6 +56,12 @@ support does not imply that every laptop's GPU, audio or wireless is supported.
 
 Curated validation results are in [VALIDATION.md](docs/VALIDATION.md).
 
+The OS input is Google's **ASUS Googlebook 14 recovery image**, codename
+**`lapis`**, build **`16452207`**. This is the **only recovery image used and
+tested** by this project. The Googlebook 14 is the image's original device;
+the VivoBook S5602ZA is our separate physical test laptop. Other recovery
+images have not been validated.
+
 ## Repository contents
 
 - `src/googlebook/`: disk validation, pure partition planner, installer and UI.
@@ -89,6 +95,45 @@ prebuilt OS download. Read the validation limits before testing a rebuilt image.
 ```sh
 python3 tools/build_from_sources.py
 ```
+
+## Credits
+
+This project builds on substantial work from the following projects and their
+contributors:
+
+- **[chaitan3/gbos-vm-linux](https://github.com/chaitan3/gbos-vm-linux)**:
+  the foundation for porting the `lapis` image, including software security
+  replacements and image, partition and ramdisk helpers. Its work made this
+  native port possible.
+- **[skylartaylor/gbos-vm](https://github.com/skylartaylor/gbos-vm)**:
+  an earlier research reference for Googlebook VM boot and porting techniques.
+  Its code is not vendored into this repository.
+- **[Android Open Source Project / Cuttlefish](https://source.android.com/docs/devices/cuttlefish)**:
+  the donor components used for software security, display, boot control and
+  audio adaptations.
+- **[TinyALSA](https://github.com/tinyalsa/tinyalsa)** and
+  **[EROFS tools](https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/)**:
+  speaker support and filesystem image tooling.
+- **[Linux](https://www.kernel.org/)**, **[Debian](https://www.debian.org/)**,
+  **[GNU GRUB](https://www.gnu.org/software/grub/)** and
+  **[QEMU](https://www.qemu.org/)**: the kernel, build/installer environment,
+  UEFI bootloader and virtual-machine validation tools.
+
+Google supplies the original recovery image. See
+[THIRD_PARTY.md](THIRD_PARTY.md) for pinned revisions, component roles and
+license notices. Credit does not imply endorsement by upstream maintainers.
+
+## Development disclosure and disclaimer
+
+Codex using **GPT-6.1 Sol** assisted with parts of the project's tooling,
+documentation and troubleshooting. That assistance is not a guarantee of
+correctness or compatibility; the [validation record](docs/VALIDATION.md)
+describes the checks performed and what still needs testing.
+
+This is an independent community project, not an official Google or ASUS
+release, and is not affiliated with or endorsed by those companies. Their
+names and trademarks belong to their respective owners. Installation is at
+your own risk; review the installation warnings and back up your data first.
 
 ## Security and licensing
 

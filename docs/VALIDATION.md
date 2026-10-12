@@ -3,6 +3,10 @@
 Validated on October 12, 2026. This is an experimental source candidate, not a
 claim of universal laptop support or a stable public binary release.
 
+All image tests use Google's ASUS Googlebook 14 (`lapis`) recovery image,
+build `16452207`. No other recovery image has been tested. Physical baseline
+testing used the separate ASUS VivoBook S5602ZA laptop.
+
 ## Source and safety checks
 
 All **27 regression tests passed on Linux**. The suite covers:
