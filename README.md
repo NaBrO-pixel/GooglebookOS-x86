@@ -77,11 +77,18 @@ Python 3.11+ is sufficient for the source tests:
 python3 -m unittest discover -s tests -v
 ```
 
-Building boot media requires an x86_64 Linux environment and a locally prepared
-native port image. This repository does not contain Google's recovery image,
-firmware or donor binaries. It currently is not a one-command build from an
-untouched Google recovery download. See [BUILD.md](docs/BUILD.md) for explicit
-inputs, upstream revisions and the release command.
+An experimental source builder now obtains pinned public inputs and prepares
+fresh boot media locally. It requires **Debian 13 x86_64**, approximately 10 GB
+of downloads and substantial free storage. This repository does not contain
+Google's recovery image, firmware or donor binaries.
+
+[Build from sources](docs/BUILD.md), then follow
+[USB flashing and installation](docs/INSTALL.md). There is currently no
+prebuilt OS download. Read the validation limits before testing a rebuilt image.
+
+```sh
+python3 tools/build_from_sources.py
+```
 
 ## Security and licensing
 

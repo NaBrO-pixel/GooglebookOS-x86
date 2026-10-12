@@ -14,6 +14,14 @@ the operating-system image or dependencies used by the build environment.
 | BusyBox, Python, glibc, e2fsprogs, dosfstools, mtools, efibootmgr | Installed from the build distribution | Retain their respective upstream licenses. |
 | Intel firmware, Android userspace and Cuttlefish donor components | Obtained separately for the prepared port | Not copied into Git or the source-only export. |
 
+The source builder fetches upstream archives into the user's ignored build
+directory. It runs external helpers with our own native overlay callbacks;
+it does not vendor those helpers into this repository. Exact download URLs,
+sizes and hashes are recorded in `profiles/sources.json`. EROFS tools are built
+from upstream commit `f36cadb5c563995ab3aa8572a60ed6b721b9557d` (1.9.4).
+The pinned Debian maintenance packages are fetched from Debian Snapshot because
+their older versions are no longer available in the current package pool.
+
 The local upstream port checkout did not contain a top-level license file when
 this source release was prepared. This project does not relicense or vendor its
 code. Check upstream permissions and the image components' notices before

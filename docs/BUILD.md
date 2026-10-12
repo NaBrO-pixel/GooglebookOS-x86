@@ -1,84 +1,157 @@
-# Build inputs and release assembly
+# Build fresh boot media from public inputs
 
-Use x86_64 Linux (including a dedicated WSL build distribution). Install Python
-3.11+, GRUB EFI build tools, mtools, dosfstools, e2fsprogs, EROFS tools, lz4,
-cpio, gzip, QEMU/KVM and OVMF from the build distribution.
+The source builder downloads the pinned stock recovery, Cuttlefish donor, NDK,
+Intel firmware and maintenance packages directly from their upstream hosts.
+It applies the native port adaptations locally and creates a fresh **Live /
+Install** image. You do not need our private lab or a capture of someone's USB.
+No OS image or donor binary is redistributed in this repository.
 
-Required external inputs:
+This is an experimental build path for developers and careful hardware testers.
+Physical testing is limited to the ASUS VivoBook S5602ZA. See
+[validation](VALIDATION.md) for what has actually been tested.
 
-- A **prepared native Googlebook port image** with its 30 GPT partitions,
-  working Intel graphics/audio fixes, firmware and donor security replacements.
-- Its matching kernel and native platform ramdisk.
-- An external `gbos-vm-linux` checkout for LP/EROFS helpers (revision in
-  `THIRD_PARTY.md`). EROFS tools 1.9.4 were used for the baseline.
-- A console maintenance initramfs root containing Python, BusyBox, lib/module
-  dependencies, blkid and its matching Debian kernel. The tested kernel is
-  `6.12.111+deb13-amd64`; its modules must match exactly.
-- Android NDK r30 and the pinned TinyALSA checkout for the minimal output helper.
+## 1. Use the supported build environment
 
-This repository is the release/installer layer. Recreating the prepared native
-baseline from an untouched official recovery image is a separate upstream port
-step; it is not automated end-to-end here. Do not substitute a signed recovery
-image directly for `prepared-native.raw`. Never use a personal live USB capture
-as the prepared input: it can contain accounts and encrypted data.
+- **Debian 13, x86_64, system Python 3.13**, native Linux or WSL 2.
+- An internet connection; approximately 10 GB of pinned downloads.
+- **100 GB of real free disk space** recommended for extraction, compilation
+  and the final image. Additional VM install tests need more space.
+- A spare **64 GB or larger USB**, preferably an external SSD for performance.
 
-Build the production output helper (no test tones or microphone probes):
+On Windows, install Debian through [Microsoft's WSL instructions](https://learn.microsoft.com/windows/wsl/install),
+then check `cat /etc/os-release` inside Debian. It must report Debian version 13.
+Keep the build inside Linux's home directory, not a OneDrive or `/mnt/c` folder.
+Check Windows free space too: WSL's virtual filesystem capacity can be much
+larger than the real free space on its host drive.
 
-```sh
-python3 tools/build_audio.py \
-  --compiler /path/to/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android35-clang \
-  --tinyalsa /path/to/tinyalsa \
-  --out /path/to/build/audio-init
+For a new Windows WSL setup, the PowerShell commands are:
+
+```powershell
+wsl --install -d Debian
+wsl -d Debian
 ```
 
-Build into a new output directory:
+Follow Microsoft's restart/account prompts if requested. If an existing Debian
+installation is older than version 13, use a fresh Debian 13 environment for
+this build instead of assuming its libraries match.
+
+Install build dependencies in Debian:
 
 ```sh
-python3 tools/build_release.py \
-  --base-image /path/to/prepared-native.raw \
-  --upstream /path/to/gbos-vm-linux \
-  --kernel /path/to/native/kernel \
-  --native-initrd /path/to/native/initrd \
-  --maintenance-root /path/to/maintenance/root \
-  --maintenance-kernel /path/to/maintenance/kernel \
-  --audio-helper /path/to/build/audio-init \
-  --out /path/to/build/release
+sudo apt-get update
+sudo apt-get install -y git python3 python3-lz4 curl unzip lz4 cpio gzip \
+  e2fsprogs dosfstools mtools grub-efi-amd64-bin efibootmgr kmod \
+  build-essential autoconf automake libtool pkg-config uuid-dev \
+  liblz4-dev liblzma-dev libzstd-dev libdeflate-dev libssl-dev \
+  qemu-system-x86 qemu-utils ovmf
 ```
 
-The builder modifies only a newly created regular image file. It strips the
-custom capture/test services, keeps hardware workarounds, uses detected CPU
-topology rather than a fixed 16-thread mask, resets live userdata/metadata,
-packages factory installation assets, assigns fresh partition identities and
-creates the two-entry menu. It does not open physical disks or copy a user's
-live data. Each installed system receives fresh partition and EFI UUIDs.
+The builder compiles its own pinned EROFS tools into the build directory. It
+extracts the maintenance kernel package without installing or replacing your
+host kernel. Run the build itself as your normal user, without `sudo`.
 
-Outputs include `googlebook-x86.raw`, `grub.cfg`, the maintenance partition,
-checksums and a build result. Raw/binary artifacts are ignored by Git. The
-approximately 36.5 GB image is sparse on a capable filesystem.
-
-Before releasing an image, run both file-backed install/boot tests:
+## 2. Get this project's source
 
 ```sh
-python3 tools/test_release_vm.py --build /path/to/build/release \
-  --out /path/to/tests/alongside --mode alongside
-python3 tools/test_release_vm.py --build /path/to/build/release \
-  --out /path/to/tests/erase --mode erase
-python3 tools/test_live_vm.py --build /path/to/build/release \
-  --out /path/to/tests/live
+cd ~
+git clone https://github.com/ReUnknown/GooglebookOS-x86.git
+cd GooglebookOS-x86
+python3 -m unittest discover -s tests -v
 ```
 
-These fixtures contain simulated Windows partitions and marker bytes, not a
-Windows installation. Serial output is added to the installed test loader for
-kernel validation. Also perform a native hardware test and verify the existing
-OS still boots before declaring a binary release stable.
+Review the [component notices](../THIRD_PARTY.md) and the
+[NDK download terms](https://developer.android.com/ndk/downloads) before building.
 
-Audit or export source without uploading it:
+## 3. Build the image
+
+To inspect the input URLs and output location first, without downloading:
 
 ```sh
-python3 tools/export_source.py --check
-python3 tools/export_source.py --out /path/to/googlebook-x86-source.zip
+python3 tools/build_from_sources.py --plan
 ```
 
-The source ZIP accepts only curated source/docs, rejects symlinks, oversized
-artifacts, private-key/token patterns and known personal identifiers. It never
-includes boot images, full logs or machine-specific installation receipts.
+Then run:
+
+```sh
+python3 tools/build_from_sources.py
+```
+
+The terminal shows nine stages and download/extraction byte progress. Pinned
+sizes and SHA-256 digests are in `profiles/sources.json`. A wrong or unavailable
+input stops the build rather than silently substituting another version.
+
+The stages fetch sources, compile tools and the speaker helper, extract the
+stock boot files and donor HALs, extract Intel firmware, prepare the native
+image, build the maintenance environment, assemble the two-entry menu and
+produce a full image checksum. All changes are to regular build files; this
+command never writes your USB or internal disk.
+
+On success the output is:
+
+```text
+.build/release/googlebook-x86.img
+.build/release/googlebook-x86.raw
+.build/release/SHA256SUMS
+```
+
+The `.img` and `.raw` names refer to the same bytes through a Linux hard link,
+not two independent disk copies. The image is approximately 36.5 GB logically;
+unused regions are sparse on a suitable filesystem. Copying it to another
+filesystem can require the full logical size.
+
+Verify it:
+
+```sh
+cd .build/release
+sha256sum -c SHA256SUMS
+cd ../..
+```
+
+Then continue with [flashing and installation](INSTALL.md).
+
+## Interrupted builds and existing downloads
+
+Rerun the same build command. Downloads are resumed when the server supports
+ranges; complete cached inputs are rechecked. Failed native/release stages are
+rebuilt from the stock input, never from a partially booted or personal image.
+Compiler details are retained locally in `.build/build-tools.log`.
+
+If an interruption leaves an incomplete ZIP extraction or the rerun reports a
+bad generated input, use a new work directory with the same verified download
+cache, as shown below. Do not bypass a checksum failure.
+
+If the source code or pins changed after an update, use a new build directory
+while reusing the old download cache:
+
+```sh
+python3 tools/build_from_sources.py --work .build-next --cache .build/cache
+```
+
+The output is then in `.build-next/release`. Build directories and their private
+receipts are ignored by Git and excluded from source exports. Do not use an
+image copied from a personal USB as a stock recovery input.
+
+## File-backed VM validation
+
+Before sharing a rebuilt image, test it without touching physical disks:
+
+```sh
+python3 tools/test_release_vm.py --build .build/release \
+  --out .build/tests-alongside --mode alongside
+python3 tools/test_release_vm.py --build .build/release \
+  --out .build/tests-erase --mode erase
+python3 tools/test_live_vm.py --build .build/release \
+  --out .build/tests-live
+```
+
+The install tests contain synthetic Windows markers, not a real Windows
+installation. VM kernel/storage checks do not validate Iris Xe desktop
+rendering, real Windows boot or repeated clean reboot/data persistence on a
+laptop. Test Live on the target hardware before considering SSD installation.
+
+## Advanced: an already prepared native image
+
+The lower-level `tools/build_release.py` remains available for developers with
+an independently prepared native image and matching boot/maintenance files.
+Use `python3 tools/build_release.py --help` for its explicit inputs. The normal
+source-build command above supplies those inputs automatically.

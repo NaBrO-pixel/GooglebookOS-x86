@@ -1,0 +1,159 @@
+{
+  "format": 1,
+  "archives": {
+    "upstream": {
+      "filename": "upstream.zip",
+      "url": "https://codeload.github.com/chaitan3/gbos-vm-linux/zip/a2942f96088f450f675c05d3702c1bcd4044aaa5",
+      "bytes": 51197,
+      "sha256": "e9f4c7fe88b6098a6e3d97edb6d5145bce6dcf37ca4229100e6477e3bbfc4cb9",
+      "commit": "a2942f96088f450f675c05d3702c1bcd4044aaa5"
+    },
+    "erofs": {
+      "filename": "erofs.zip",
+      "url": "https://codeload.github.com/erofs/erofs-utils/zip/f36cadb5c563995ab3aa8572a60ed6b721b9557d",
+      "bytes": 339307,
+      "sha256": "d5ca4b6b249af4c0da234dd5a0812e0438a9dd19874d4d8859d55c5ef8dd114a",
+      "commit": "f36cadb5c563995ab3aa8572a60ed6b721b9557d"
+    },
+    "tinyalsa": {
+      "filename": "tinyalsa.zip",
+      "url": "https://codeload.github.com/tinyalsa/tinyalsa/zip/961babfe962e71d952ae734074cc89576b28a9e7",
+      "bytes": 160139,
+      "sha256": "2fb8816cf89cd5cb257f10f3ab403bdbc667664e2f764f4c77f79cea9e19e250",
+      "commit": "961babfe962e71d952ae734074cc89576b28a9e7"
+    },
+    "recovery": {
+      "filename": "lapis-16452207-recovery.zip",
+      "url": "https://dl.google.com/device/recovery/lapis-user/16452207/recovery.zip",
+      "bytes": 7728873477,
+      "sha256": "5bc64936c11d9eb268da03063a443b8fd0bbc0f84d266f9a014231653939f247",
+      "entry": "android-desktop_signed_recovery_image.bin",
+      "raw_sha256": "b10f519ad9b834b316bc3c9d7c33fc45438a8d1c69254c124b7c3cdf72d288c7",
+      "raw_bytes": 19069493760
+    },
+    "donor": {
+      "filename": "aosp_cf_x86_64_only_phone-img-16373615.zip",
+      "url": "https://ci.android.com/builds/submitted/16373615/aosp_cf_x86_64_only_phone-userdebug/latest/aosp_cf_x86_64_only_phone-img-16373615.zip",
+      "bytes": 1163638742,
+      "sha256": "601d55e3197a2a612becc6931f111fd00caac5cbc70e0fa8261fbdb4cb22c695",
+      "resolve_ci": true
+    },
+    "ndk": {
+      "filename": "android-ndk-r30-linux.zip",
+      "url": "https://dl.google.com/android/repository/android-ndk-r30-linux.zip",
+      "bytes": 738633529,
+      "sha256": "753611f410d002cfcd3f3dc2ef49aad532089d3180b436c060a90bf0fcb64df2"
+    }
+  },
+  "packages": {
+    "graphics": {
+      "filename": "firmware-intel-graphics_20260810-1~bpo13+1_all.deb",
+      "url": "https://deb.debian.org/debian/pool/non-free-firmware/f/firmware-nonfree/firmware-intel-graphics_20260810-1~bpo13+1_all.deb",
+      "bytes": 8053372,
+      "sha256": "54491f55df1a836c86aec01006112187889fb236745749a87ba5a6bdf98c351d"
+    },
+    "wireless": {
+      "filename": "firmware-iwlwifi_20260810-1~bpo13+1_all.deb",
+      "url": "https://deb.debian.org/debian/pool/non-free-firmware/f/firmware-nonfree/firmware-iwlwifi_20260810-1~bpo13+1_all.deb",
+      "bytes": 25088852,
+      "sha256": "b18e464f3aebaba89f0a04a3f163661201b40df18386a4506a01eaddb5f0d4b2"
+    },
+    "kernel": {
+      "filename": "linux-image-6.12.111+deb13-amd64_6.12.111-1_amd64.deb",
+      "url": "https://snapshot.debian.org/file/e66b1c8998bfdb94943a2c08843215016b837a9a",
+      "bytes": 108048516,
+      "sha256": "792e7a407f8f39fa0db3deeb6cda4e4bb56042963376133a072856b1c685d4f3"
+    },
+    "busybox": {
+      "filename": "busybox-static_1%3a1.37.0-6+b9_amd64.deb",
+      "url": "https://snapshot.debian.org/file/3827ed7fbd1b3928d5cb45bbe390c27862193e70",
+      "bytes": 955316,
+      "sha256": "598a3fd92bdafc34cd81196b2952ad36e910e47a4ecf162f8ce5e8e262598e53"
+    }
+  },
+  "maintenance_kernel": "6.12.111+deb13-amd64",
+  "donor_files": {
+    "keymint-service": "6d42d44e062d8c418b0fd8695ff3a3a606aae339e0aa5aceeb62a41200816f3c",
+    "gatekeeper.nonsecure.apex": "17ed9be4744ff86e9151af3fc82aff508a5e4bd54e9b5e679d45ecb499b930b3",
+    "boot-service": "46e7d519bdfc8dbf871ba943962448e87628286b52ce7f2b55c48ed47c95069f",
+    "lib64/libssl.so": "1224c019ad96a87504c6ca13ccd3db8e0deef62d4065262665b44b0880e8a1c1",
+    "lib64/libbase.so": "e6ac913c2640240a96ba596e970c171d60a442ac229d5d59249b4be7572719d9",
+    "lib64/libc++.so": "1d01d51b0cdf7ad4224f96e5a3bbd33556cf2ccca6abc6bc886f7e1c4a40fc34",
+    "lib64/libcutils.so": "c748f815adc25f1bda1f39717dadf8dc4180b1e29fc787fc22494f128caf3974",
+    "lib64/libcrypto.so": "3d65a2856719ca4098c0fcd82edabbb850a9ccfbca047245db8380474b14da16",
+    "vintf/android.hardware.security.secureclock-service.xml": "f46ca5fbae32a642f89d4dfaa4b6623781a3df42d3608d29308c301f18c2c70b",
+    "vintf/android.hardware.security.keymint-service.xml": "fcd54e9c542b3e2817d9fdd505c2ff93f158826c17406bb8e7ec0aed0db7da16",
+    "vintf/android.hardware.security.sharedsecret-service.xml": "4a695ea68f735c7501a4ee885a28ed0dee8f533b1975c4d297c896a28766b9ff",
+    "composer/drm_hwcomposer_atom_reporter.so": "d7129fff87ec9ddfb553671af410a0ce4ab27e53b31fd32d20afc0d535ce90fd",
+    "composer/hwc3-service.drm": "a614b6d3994bb074f938b166f37d9c2c6ce99ba0ca7e349a038d9150f0df1964",
+    "audio/r_submix_audio_policy_configuration.xml": "44aa04e6a3fe674bf22e1e87fee602ca4d42e701740bf96f0101fe6c3b2abe09",
+    "audio/com.android.hardware.audio.apex": "bf8790de820d2c392b851d0c1c662fec944ae5356db0bfed73a807c2760fc348",
+    "audio/bluetooth_with_le_audio_policy_configuration_7_0.xml": "59615b080e62635347c24511168fad0f6e1f959e520d9cf402e7e6f98be4b914",
+    "audio/audio_effects.xml": "26b54895f82ece727f871568e6099a6e890e63125e3549b1eb61e91e6f4c2c9b",
+    "audio/surround_sound_configuration_5_0.xml": "d89314c8ac10249b3f25a372c4c52f81c1173f4e5011679427e3b47641bf3789",
+    "audio/audio_policy_volumes.xml": "c76950c2751984d6edc10c892068e2dce1bfdc9ee4622a8a01a082ae3cb017b5",
+    "audio/primary_audio_policy_configuration.xml": "cffc32aa4eee6a8c0c5071711247ab4bd03c053b73df1241f7e2b53a304fe5ca",
+    "audio/usb_audio_policy_configuration.xml": "13f6bfaa10b9e77974b0e250fb59e4f583ce0a623766c8cfce1451c96f37afde",
+    "audio/audio_policy_configuration.xml": "7b5981137bcf324d1f66d331a134a4facbba758622c4567ec310eb7b26719022",
+    "audio/audio_effects_config.xml": "834bd23e17a980ba81cddfa72c44871fd39e4df95a26c78aa477fdfcada3a8d5",
+    "audio/default_volume_tables.xml": "9b865f9fe272bdd0f23357f630da21ffd73742358e7e33bfcdf6c853e9e59f79"
+  },
+  "modules": {
+    "failover.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/failover.ko",
+      "sha256": "1f8bbbc72536e3476bfc5bd2a28d8872876c783db906fd71e70212800219d667",
+      "bytes": 26344,
+      "filename": "failover.ko",
+      "resolve_ci": true
+    },
+    "virtio_input.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/virtio_input.ko",
+      "sha256": "6d338afb9288c39186ca19b29d70dbb4097a9f4fe7a7cd2ae25015edadbfd06f",
+      "bytes": 36416,
+      "filename": "virtio_input.ko",
+      "resolve_ci": true
+    },
+    "virtio_dma_buf.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/virtio_dma_buf.ko",
+      "sha256": "769e04fca7716c7070cdc3ffce6352db60fb1db09d0fb13f0e342f0770b14cfd",
+      "bytes": 11648,
+      "filename": "virtio_dma_buf.ko",
+      "resolve_ci": true
+    },
+    "virtio-rng.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/virtio-rng.ko",
+      "sha256": "a99432608e8c7c72351cddd9c44135fb52326302c9d48d12d58745d2f9618af2",
+      "bytes": 23448,
+      "filename": "virtio-rng.ko",
+      "resolve_ci": true
+    },
+    "virtio-gpu.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/virtio-gpu.ko",
+      "sha256": "37ce89826491841d7b8e98a5ad478b7437b797b6072dcfec82a44e12377a8367",
+      "bytes": 294776,
+      "filename": "virtio-gpu.ko",
+      "resolve_ci": true
+    },
+    "virtio_snd.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/virtio_snd.ko",
+      "sha256": "b61e5b70327a4763d78a9b5b4a15b94d2ab38fd71dfdab155677ba55d5909d14",
+      "bytes": 114168,
+      "filename": "virtio_snd.ko",
+      "resolve_ci": true
+    },
+    "net_failover.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/net_failover.ko",
+      "sha256": "78bd8bc51be28fe8d90afdb7ae14815d5c927dbd28f14316936c174a3b943c0a",
+      "bytes": 44336,
+      "filename": "net_failover.ko",
+      "resolve_ci": true
+    },
+    "virtio_net.ko": {
+      "url": "https://ci.android.com/builds/submitted/16302624/kernel_virt_x86_64/latest/virtio_net.ko",
+      "sha256": "0ba26f3a0e319102cf787802c3e3bc44f176acc3f550d175144d12ae8517769c",
+      "bytes": 256848,
+      "filename": "virtio_net.ko",
+      "resolve_ci": true
+    }
+  }
+}

@@ -179,7 +179,16 @@ def build(args):
     if args.out.exists():raise ValueError('Choose a new output directory; previous builds are preserved')
     args.out.mkdir(parents=True);stage=args.out/'stage';stage.mkdir()
     image=args.out/'googlebook-x86.raw'
-    command(['cp','--reflink=auto','--sparse=always',args.base_image,image])
+    if getattr(args,'consume_generated_base',False):
+        marker=args.base_image.parent/'native-build.json'
+        if args.base_image.is_symlink() or args.base_image.parent.resolve().parent!=args.out.resolve().parent:
+            raise ValueError('Generated base must be a sibling stage in the same build directory')
+        receipt=json.loads(marker.read_text())
+        if receipt.get('fresh_from_pinned_recovery') is not True or receipt.get('image_name')!=args.base_image.name:
+            raise ValueError('Only a generated fresh base can be moved into the release stage')
+        args.base_image.rename(image)
+    else:
+        command(['cp','--reflink=auto','--sparse=always',args.base_image,image])
     with image.open('rb') as f:
         snapshot=gpt.inspect(lambda at,n:(f.seek(at),f.read(n))[1],image.stat().st_size)
     parts=snapshot['partitions']

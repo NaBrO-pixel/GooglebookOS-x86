@@ -1,4 +1,41 @@
-# Two boots, one reviewed installation
+# Build, flash and install
+
+There is currently no prebuilt image download. Start with
+[the source-build guide](BUILD.md): it explains how to obtain the public inputs
+and create `.build/release/googlebook-x86.img`. The rest of this guide assumes
+that build finished successfully and its checksum passed.
+
+## Prepare the USB
+
+Use a spare **64 GB or larger USB**. Flashing replaces its partitions and files.
+The image contains a fresh setup, not the builder's account, apps or game saves.
+
+On Windows or Linux, a graphical raw-image writer such as
+[balenaEtcher](https://etcher.balena.io/) can write `googlebook-x86.img`.
+Select the image file, identify the intended USB by its model and capacity,
+then flash and wait for verification. Do not select an internal SSD as the
+flashing target. Do not merely copy the image file onto a formatted USB.
+
+For Windows/WSL, copy the `.img` file and `SHA256SUMS` into a Windows-accessible
+folder first. Allow at least 37 GB there for the expanded copy. In PowerShell,
+run this from that folder and compare its hash with the `.img` line in
+`SHA256SUMS`:
+
+```powershell
+Get-FileHash -Algorithm SHA256 -LiteralPath .\googlebook-x86.img
+```
+
+After flashing, cancel any Windows request to format the unfamiliar partitions.
+Safely eject the USB, connect it to the test laptop, and use its firmware boot
+menu to select the USB in **UEFI** mode. Secure Boot must be disabled for this
+unsigned experimental image. Keep disk-encryption recovery keys available
+before changing firmware settings. On the tested ASUS, Esc opens the boot menu.
+
+Select **Live first** and verify that setup, graphics, keyboard, touchpad,
+wireless and speakers work on the target device. Only consider **Install**
+after that hardware test. Other laptop models have not been physically tested.
+
+## The boot menu
 
 Actual menu captured in the file-backed UEFI walkthrough:
 

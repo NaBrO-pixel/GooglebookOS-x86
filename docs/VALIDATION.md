@@ -5,7 +5,7 @@ claim of universal laptop support or a stable public binary release.
 
 ## Source and safety checks
 
-All **19 regression tests passed on Linux**. The suite covers:
+All **27 regression tests passed on Linux**. The suite covers:
 
 - Disk capacities from 128 GiB to 2 TiB, differently positioned free regions,
   sparse GPT slot numbering and user-selected allocation sizes.
@@ -17,6 +17,9 @@ All **19 regression tests passed on Linux**. The suite covers:
   payload chunks and caught GPT commit rollback.
 - Actual completion counts/heartbeat and firmware-order preservation.
 - Source export exclusion of lab folders, keys/tokens and external symlinks.
+- Source-cache/donor hash rejection, portable input paths, ZIP traversal and
+  external-symlink rejection, generated-stage cleanup bounds, native graphics /
+  audio / CPU policy transformations and image aliases without duplicate data.
 
 The suite passes on Linux. Platform-specific disk-file and symlink tests are
 skipped on Windows rather than accessing a physical disk.
@@ -56,6 +59,20 @@ The final Live smoke test also passed: its native kernel booted with the fresh
 release boot UUID, USB native partitions were detected and custom recording
 services did not start. No internal disk was attached to that VM. This is a
 kernel/storage test, not a validated virtual desktop.
+
+## Source-build pipeline verification
+
+The new source-build pipeline was also exercised from the pinned official
+recovery ZIP, Cuttlefish ZIP, NDK ZIP, source archives and Debian packages.
+The run reused verified downloads, not an old prepared image or extracted
+donor/SDK. It completed all nine stages, produced fresh Live/Install media and
+a full-image SHA-256 checksum. Both installation modes then passed the full
+file-backed UEFI checks listed above on that rebuilt image, including fresh
+encrypted data, automatic shutdown and boot with the USB absent.
+
+These results do not establish a working desktop on another laptop. The
+source-built native vendor is assembled in one pass from the stock recovery;
+it needs the same physical ASUS follow-up as the earlier cleaned candidate.
 
 ## Limits and next acceptance test
 
