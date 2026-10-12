@@ -8,7 +8,7 @@ import re
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
-FILES={'README.md','LICENSE','THIRD_PARTY.md','CONTRIBUTING.md','pyproject.toml','.gitignore','.gitattributes'}
+FILES={'README.md','LICENSE','THIRD_PARTY.md','pyproject.toml','.gitignore','.gitattributes'}
 FOLDERS={'src','tools','tests','profiles','docs','LICENSES','.github'}
 SUFFIXES={'.py','.c','.md','.toml','.json','.yml','.txt','.png','.svg'}
 SENSITIVE=[re.compile(pattern,re.I) for pattern in (

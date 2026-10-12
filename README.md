@@ -3,7 +3,7 @@
 An experimental Googlebook OS port for UEFI x86_64 hardware, with a persistent
 USB session and an offline NVMe installer. It is an independent project.
 
-> **Experimental — not ready for daily use.** Physical hardware testing has
+> **Experimental — not recommended for daily use.** Physical hardware testing has
 > been limited to **one device: an ASUS VivoBook S5602ZA**, with a Core
 > i5-12500H, Intel Iris Xe graphics and Intel AX211 wireless. The cleaned release
 > candidate still needs a follow-up test on that laptop. Other devices have
