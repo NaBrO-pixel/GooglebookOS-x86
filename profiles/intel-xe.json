@@ -1,0 +1,13 @@
+{
+  "required_cpu_flags": [
+    "gfni",
+    "sha_ni",
+    "avx_vnni"
+  ],
+  "name": "Experimental Intel Xe",
+  "tested_hardware": [
+    "ASUS VivoBook S5602ZA / Core i5-12500H / Iris Xe / AX211"
+  ],
+  "kernel_args": "root=/dev/ram0 panic=0 loglevel=3 quiet 8250.nr_uarts=4 console_msg_format=syslog log_buf_len=2M cgroup_disable=pressure firmware_class.path=/vendor/firmware binder.impl=rust ia32_emulation=false vsyscall=none androidboot.hardware=android-desktop androidboot.hardware.platform=android-desktop androidboot.slot_suffix=_a androidboot.boot_part_uuid=@BOOT_UUID@ androidboot.vbmeta.size=6720 androidboot.vbmeta.hash_alg=sha256 androidboot.vbmeta.digest=bc270dbed03f9068d69d3da5dcbfcf80a947186d36b5dd4c5a6bcc5f7dc45ec2 androidboot.vbmeta.device_state=unlocked androidboot.verifiedbootstate=orange androidboot.veritymode=enforcing androidboot.vendor.apex.com.android.hardware.keymint.strongbox.desktop=none androidboot.vendor.apex.com.android.hardware.audio.desktop=none xe.force_probe=46a6 xe.enable_psr=0 androidboot.gbos_bt=native androidboot.gbos_renderer=gl androidboot.gbos_shader_cache=single androidboot.gbos_angle=legacy androidboot.gbos_audio=alsa snd_intel_dspcfg.dsp_driver=1 snd_hda_intel.dmic_detect=0 snd_hda_intel.power_save=0",
+  "microphone": "Experimental SOF route is omitted; HDA output is the default"
+}
