@@ -203,12 +203,13 @@ def preflight():
 
 def build(args):
     lock=json.loads(LOCK.read_text()); work=args.work.resolve(); cache=(args.cache or work/'cache').resolve()
+    profile_path=args.profile.resolve(); profile=json.loads(profile_path.read_text())
     build_files=[Path(__file__),ROOT/'tools/native_port.py',ROOT/'tools/build_release.py',
-        ROOT/'tools/build_audio.py',ROOT/'tools/audio_init.c',ROOT/'profiles/intel-xe.json',
+        ROOT/'tools/build_audio.py',ROOT/'tools/audio_init.c',profile_path,
         *sorted((ROOT/'src').rglob('*.py'))]
     fingerprint=hashlib.sha256(LOCK.read_bytes()+b''.join(p.read_bytes() for p in build_files)).hexdigest()
     if args.plan:
-        print(json.dumps({'host':'Debian 13 x86_64','work':str(work),'steps':9,
+        print(json.dumps({'host':'Debian 13 x86_64','work':str(work),'steps':9,'profile':profile['name'],
             'downloads':[s['url'] for s in [*lock['archives'].values(),*lock['packages'].values(),*lock['modules'].values()]],
             'output':str(work/'release/googlebook-x86.raw'),'physical_disk_access':False},indent=2)); return
     preflight()
@@ -295,7 +296,7 @@ def build(args):
     firmware=extracted/'usr/lib/firmware'
     stage('Prepare a fresh native image; apply graphics/audio fixes',6)
     native=work/'native'; native.mkdir()
-    def overlay(src_fs,donor,files): return vendor_overlay(src_fs,donor,files,firmware,helper)
+    def overlay(src_fs,donor,files): return vendor_overlay(src_fs,donor,files,firmware,helper,profile)
     execute_upstream(upstream/'make_lapis_security_port.py',
         ['--raw',raw,'--donor',donor,'--out',native,'--locksettings','--quiet-absent-hardware','--composer','--vmcompat','--no-initrd'],
         [('    tar = tmp / \'overlay.tar\'\n','    files.update(_gbos_native_overlay(src_fs, donor, files))\n')],
@@ -311,7 +312,7 @@ def build(args):
     from build_release import build as release_build
     release_build(argparse.Namespace(base_image=image,upstream=upstream,kernel=upstream/'firmware/kernel',
         native_initrd=initrd,maintenance_root=maintenance,maintenance_kernel=kernel,audio_helper=helper,
-        profile=ROOT/'profiles/intel-xe.json',out=work/'release',consume_generated_base=True))
+        profile=profile_path,out=work/'release',consume_generated_base=True))
     stage('Write image checksum and completion receipt',9)
     result=work/'release/googlebook-x86.raw'; sha=digest(result)
     alias=image_alias(result)
@@ -325,6 +326,7 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--work',type=Path,default=ROOT/'.build')
     p.add_argument('--cache',type=Path,help='Optional directory containing the exact pinned download filenames')
+    p.add_argument('--profile',type=Path,default=ROOT/'profiles/intel-xe.json',help='Hardware profile JSON in profiles/')
     p.add_argument('--plan',action='store_true',help='Print inputs/steps without downloading or writing')
     p.add_argument('--recovery-file',type=Path,help='Reuse an untouched official recovery RAW; full pinned hash required')
     p.add_argument('--donor-dir',type=Path,help='Reuse extracted donor only if every pinned donor-file hash matches')

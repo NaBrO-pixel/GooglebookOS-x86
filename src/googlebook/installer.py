@@ -42,7 +42,7 @@ def check_manifest(stage,manifest):
         if p.get('asset') and p['asset'] not in manifest['assets']:raise ValueError('Missing packaged factory asset')
 
 
-def make_esp(stage,plan,manifest,destination):
+def make_esp(stage,plan,manifest,destination,storage='nvme'):
     with destination.open('xb') as f:f.truncate(256*MIB)
     subprocess.run(['mkfs.fat','-F','32','-n','GOOGLEBOOK','-i',plan.fat_id,str(destination)],check=True,capture_output=True)
     subprocess.run(['mmd','-i',str(destination),'::/EFI','::/EFI/BOOT','::/EFI/Googlebook'],check=True)
@@ -52,7 +52,7 @@ def make_esp(stage,plan,manifest,destination):
     config=f'''set timeout=0
 search --fs-uuid --set=root {fat_uuid}
 menuentry 'Googlebook OS' {{
-    linux /EFI/Googlebook/kernel {args} androidboot.gbos_storage=nvme
+    linux /EFI/Googlebook/kernel {args} androidboot.gbos_storage={storage}
     initrd /EFI/Googlebook/initrd
 }}
 '''
@@ -144,7 +144,8 @@ class Installer:
         self.target.open_write(self.source,self.before)
         try:
             with tempfile.TemporaryDirectory(prefix='googlebook-install-') as tmp:
-                esp_file=Path(tmp)/'esp.img';make_esp(self.stage,self.plan,self.manifest,esp_file)
+                esp_file=Path(tmp)/'esp.img';make_esp(self.stage,self.plan,self.manifest,esp_file,
+                    'nvme' if self.target.path.name.startswith('nvme') else 'sata')
                 payloads=[p for p in self.plan.partitions if p['name']!='userdata']
                 total=2*MIB+sum(2*p['bytes'] for p in payloads)
                 with Progress(total) as progress:

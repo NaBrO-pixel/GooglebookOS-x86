@@ -9,9 +9,18 @@ import struct
 from . import gpt
 
 
+def transport(sys):
+    """Classify a whole disk by its sysfs bus path; USB is never an install target."""
+    if sys.name.startswith('nvme'):return 'nvme'
+    path=str(sys.resolve())
+    if '/usb' in path:return 'usb'
+    if '/ata' in path and sys.name.startswith('sd'):return 'sata'
+    return 'other'
+
+
 class Disk:
-    def __init__(self,path,file_test=False):
-        self.path=Path(path).resolve();self.file_test=file_test;self.writable=False
+    def __init__(self,path,file_test=False,transports=('nvme',)):
+        self.path=Path(path).resolve();self.file_test=file_test;self.writable=False;self.transports=tuple(transports)
         mode=self.path.stat().st_mode
         if file_test:
             if not stat.S_ISREG(mode):raise ValueError('File tests cannot access block devices')
@@ -39,11 +48,13 @@ class Disk:
 
     def assert_idle(self):
         if self.file_test:return
-        if not self.path.name.startswith('nvme'):
-            raise ValueError('This first release installs only to whole NVMe disks')
+        kind=transport(self.sys)
+        if kind not in self.transports:
+            raise ValueError('This release installs only to whole '+'/'.join(t.upper() for t in self.transports)+' disks')
+        if kind=='sata' and (self.sys/'removable').read_text().strip()!='0':raise ValueError('Removable disks are not install targets')
         mounted={line.split()[2] for line in Path('/proc/self/mountinfo').read_text().splitlines()}
         swapped={str(Path(line.split()[0]).resolve()) for line in Path('/proc/swaps').read_text().splitlines()[1:]}
-        for child in [self.sys,*self.sys.glob(self.path.name+'p*')]:
+        for child in [self.sys,*self.sys.glob(self.path.name+('p*' if kind=='nvme' else '[0-9]*'))]:
             if (child/'dev').read_text().strip() in mounted or '/dev/'+child.name in swapped:
                 raise ValueError('Target or one of its partitions is mounted/in swap')
             if list((child/'holders').iterdir()):raise ValueError('Target has active RAID/device-mapper holders')
@@ -56,7 +67,7 @@ class Disk:
         if self.path==source.path or (not self.file_test and self.device_id==source.device_id):raise ValueError('Cannot install over the source USB')
         self.assert_idle()
         if gpt.capture(self.read,self.size)!=before:raise ValueError('Disk layout changed after review')
-        again=Disk(self.path,self.file_test)
+        again=Disk(self.path,self.file_test,self.transports)
         try:
             if again.identity!=self.identity:raise ValueError('Selected disk identity changed')
         finally:again.close()
@@ -106,13 +117,14 @@ def find_source(stage, manifest):
     return source
 
 
-def targets(source):
+def targets(source,transports=('nvme',)):
     found=[]
-    for item in sorted(Path('/sys/class/block').glob('nvme*n*')):
+    patterns=[pattern for kind,pattern in (('nvme','nvme*n*'),('sata','sd*')) if kind in transports]
+    for item in sorted(p for pattern in patterns for p in Path('/sys/class/block').glob(pattern)):
         if (item/'partition').exists():continue
         disk=None
         try:
-            disk=Disk('/dev/'+item.name)
+            disk=Disk('/dev/'+item.name,transports=transports)
             if disk.device_id==source.device_id:continue
             disk.assert_idle();found.append(disk);disk=None
         except (ValueError,OSError):pass

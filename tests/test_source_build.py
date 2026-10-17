@@ -48,6 +48,24 @@ class SourceBuildTests(unittest.TestCase):
         self.assertIn('aaudio.mmap_policy=1\n',after)
         self.assertNotIn('aaudio.mmap_policy=2',after)
 
+    def test_profile_properties_override_defaults_once(self):
+        before=b'ro.hardware.vulkan=intel\nvendor.hwc.backend_override=device\n'
+        after=native.patch_properties(before,{'ro.hardware.vulkan':'pastel'}).decode()
+        self.assertEqual(after.count('ro.hardware.vulkan='),1)
+        self.assertIn('ro.hardware.vulkan=pastel\n',after)
+        self.assertIn('vendor.hwc.backend_override=client\n',after)
+
+    def test_hardware_profiles_are_complete(self):
+        for path in sorted((ROOT/'profiles').glob('*.json')):
+            if path.name=='sources.json':continue
+            with self.subTest(profile=path.name):
+                profile=json.loads(path.read_text())
+                self.assertEqual(profile['kernel_args'].count('@BOOT_UUID@'),1)
+                self.assertTrue(profile['required_cpu_flags'])
+                self.assertTrue(set(profile.get('install_transports',['nvme']))<={'nvme','sata'})
+                for name in profile.get('firmware',[]):
+                    self.assertFalse(Path(name).is_absolute());self.assertNotIn('..',Path(name).parts)
+
     def test_power_uses_dynamic_topology_but_retains_thermal_controls(self):
         power={'Nodes':[{'Name':'FGCpuset'},{'Name':'XeIrqAffinity'},
             {'Name':'SchedLoadBalance','Values':['0','1'],'DefaultIndex':0},
