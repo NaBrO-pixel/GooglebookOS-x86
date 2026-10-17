@@ -122,7 +122,7 @@ mount -t devtmpfs devtmpfs /dev
 mkdir -p /dev/pts /sys/firmware/efi/efivars
 mount -t devpts devpts /dev/pts
 mount -t efivarfs efivarfs /sys/firmware/efi/efivars 2>/dev/null
-for m in nvme xhci_pci ehci_pci ohci_pci usb_storage uas sd_mod ext4 vfat usbhid hid_generic; do modprobe "$m" 2>/dev/null; done
+for m in nvme ahci xhci_pci ehci_pci ohci_pci usb_storage uas sd_mod ext4 vfat usbhid hid_generic; do modprobe "$m" 2>/dev/null; done
 device=''
 for attempt in $(seq 1 45); do
     for p in /dev/sd*[0-9] /dev/nvme*n*p[0-9]*; do
@@ -234,6 +234,7 @@ def build(args):
     source_gpt=gpt.assemble(new_size,parts+[stage_part])
     manifest=dict(format=1,version='0.1.0-rc1',profile=profile['name'],image_bytes=new_size,
                   required_cpu_flags=profile['required_cpu_flags'],
+                  install_transports=profile.get('install_transports',['nvme']),
                   source_disk_guid=source_gpt['disk_guid'],source_table_sha256=gpt.digest(gpt.raw(source_gpt)[2]),
                   stage_fs_uuid=str(uuid.uuid4()),payloads=payloads,assets={})
     maintenance(stage,args,manifest)
@@ -285,7 +286,8 @@ menuentry 'Install' {{
     validation=dict(version=manifest['version'],physical_disk_access=False,boot_entries=['Live','Install'],
                     runtime_cleanup=clean,source_gpt_valid=True,fresh_live_userdata=True,
                     fresh_factory_install_assets=True,installer_stage_sha256=hash_file(stage_file),
-                    public_manifest_contains_personal_identity=False,native_compatibility='Experimental Intel Xe profile; ASUS S5602ZA baseline')
+                    public_manifest_contains_personal_identity=False,
+                    native_compatibility=profile.get('native_compatibility','Experimental Intel Xe profile; ASUS S5602ZA baseline'))
     (args.out/'build.json').write_text(json.dumps(validation,indent=2)+'\n')
     print(json.dumps(validation,indent=2))
 

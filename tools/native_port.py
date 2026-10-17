@@ -75,17 +75,19 @@ AUDIO_CONFIGS = ('audio_effects.xml', 'audio_effects_config.xml',
     'default_volume_tables.xml', 'bluetooth_with_le_audio_policy_configuration_7_0.xml',
     'primary_audio_policy_configuration.xml', 'r_submix_audio_policy_configuration.xml',
     'surround_sound_configuration_5_0.xml', 'usb_audio_policy_configuration.xml')
+# Defaults reproduce the tested Intel Xe profile; other profiles list their own.
 FIRMWARE = ('i915/adlp_guc_70.bin', 'i915/adlp_dmc.bin', 'i915/adlp_dmc_ver2_16.bin',
     'i915/tgl_huc.bin', 'iwlwifi-so-a0-gf-a0.pnvm', 'iwlwifi-so-a0-gf-a0-72.ucode',
     'iwlwifi-so-a0-gf-a0-89.ucode', 'intel/ibt-0040-0041.sfi', 'intel/ibt-0040-0041.ddc',
     'intel/ibt-1040-0041.sfi', 'intel/ibt-1040-0041.ddc')
+MODULES = ('snd-hda-codec-alc269.ko', 'snd-hda-intel.ko', 'btintel.ko', 'btusb.ko')
 
 
-def patch_properties(data):
+def patch_properties(data, extra=None):
     changes = {'ro.vendor.apex.com.android.hardware.audio.desktop': 'none',
         'aaudio.mmap_policy': '1', 'audio.offload.disable': '1',
         'vendor.hwc.backend_override': 'client',
-        'ro.vendor.hwc.drm.present_fence_not_reliable': 'true'}
+        'ro.vendor.hwc.drm.present_fence_not_reliable': 'true', **(extra or {})}
     lines = [l for l in data.decode().splitlines() if l.split('=', 1)[0] not in changes]
     return ('\n'.join(lines) + '\n' + ''.join(k+'='+v+'\n' for k,v in changes.items())).encode()
 
@@ -116,8 +118,9 @@ def audio_extract(vendor_file, temporary, out):
         (audio/name).write_bytes(data)
 
 
-def vendor_overlay(src_fs, donor, files, firmware_root, helper):
+def vendor_overlay(src_fs, donor, files, firmware_root, helper, profile=None):
     """Return additions for the upstream's one-pass vendor overlay."""
+    profile = profile or {}
     def cat(name):
         return subprocess.check_output(['dump.erofs', '--cat', '--path='+name, str(src_fs)])
     additions = {}
@@ -139,19 +142,19 @@ def vendor_overlay(src_fs, donor, files, firmware_root, helper):
     add('etc/googlebook-audio-init', helper.read_bytes(), 'hal_audio_default_exec', 0o755, 0, 2000)
     add('etc/init/hal_desktop_charge_control_default.rc', b'# No Chrome EC charge-control hardware.\n')
     cfg = cat('/etc/init.insmod.cfg').decode().splitlines()
-    for name in ('snd-hda-codec-alc269.ko', 'snd-hda-intel.ko', 'btintel.ko', 'btusb.ko'):
+    for name in profile.get('vendor_modules', MODULES):
         request = 'modprobe|'+name
         if request not in cfg: cfg.append(request)
     add('etc/init.insmod.cfg', ('\n'.join(cfg)+'\n').encode())
     add('etc/powerhint.json', patch_power(cat('/etc/powerhint.json')))
     old_prop = files['build.prop']
-    additions['build.prop'] = (patch_properties(old_prop[0]), *old_prop[1:])
+    additions['build.prop'] = (patch_properties(old_prop[0], profile.get('properties')), *old_prop[1:])
     secret = 'etc/init/android.hardware.security.secretkeeper.trusty.desktop.rc'
     rc = cat('/'+secret).decode()
     if '    disabled\n' not in rc:
         rc = rc.replace('    class hal\n', '    class hal\n    disabled\n    oneshot\n')
     add(secret, rc.encode())
-    for name in FIRMWARE:
+    for name in profile.get('firmware', FIRMWARE):
         source = (firmware_root/name).resolve(strict=True)
         if not source.is_relative_to(firmware_root.resolve()):
             raise ValueError('Firmware symlink escapes extracted package')

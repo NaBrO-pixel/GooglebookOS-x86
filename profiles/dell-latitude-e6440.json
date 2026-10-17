@@ -1,0 +1,45 @@
+{
+  "name": "Experimental Dell Latitude E6440",
+  "tested_hardware": [],
+  "target_hardware": [
+    "Dell Latitude E6440 / Core i5-4300M (Haswell) / HD Graphics 4600 / Centrino Advanced-N 6235 / Realtek ALC3226 / SATA"
+  ],
+  "native_compatibility": "Experimental Dell Latitude E6440 profile; untested on hardware",
+  "required_cpu_flags": [
+    "sse4_2",
+    "popcnt",
+    "avx2",
+    "fma",
+    "bmi2",
+    "movbe"
+  ],
+  "install_transports": [
+    "nvme",
+    "sata"
+  ],
+  "kernel_args": "root=/dev/ram0 panic=0 loglevel=3 quiet 8250.nr_uarts=4 console_msg_format=syslog log_buf_len=2M cgroup_disable=pressure firmware_class.path=/vendor/firmware binder.impl=rust ia32_emulation=false vsyscall=none androidboot.hardware=android-desktop androidboot.hardware.platform=android-desktop androidboot.slot_suffix=_a androidboot.boot_part_uuid=@BOOT_UUID@ androidboot.vbmeta.size=6720 androidboot.vbmeta.hash_alg=sha256 androidboot.vbmeta.digest=bc270dbed03f9068d69d3da5dcbfcf80a947186d36b5dd4c5a6bcc5f7dc45ec2 androidboot.vbmeta.device_state=unlocked androidboot.verifiedbootstate=orange androidboot.veritymode=enforcing androidboot.vendor.apex.com.android.hardware.keymint.strongbox.desktop=none androidboot.vendor.apex.com.android.hardware.audio.desktop=none androidboot.gbos_bt=native androidboot.gbos_renderer=gl androidboot.gbos_shader_cache=single androidboot.gbos_angle=legacy androidboot.gbos_audio=alsa snd_hda_intel.index=1,0 snd_intel_dspcfg.dsp_driver=1 snd_hda_intel.dmic_detect=0 snd_hda_intel.power_save=0",
+  "vendor_modules": [
+    "snd-hda-codec-alc269.ko",
+    "snd-hda-intel.ko",
+    "btintel.ko",
+    "btusb.ko",
+    "i915.ko",
+    "ahci.ko",
+    "iwldvm.ko",
+    "iwlmvm.ko",
+    "e1000e.ko",
+    "psmouse.ko"
+  ],
+  "firmware": [
+    "iwlwifi-6000g2b-6.ucode",
+    "iwlwifi-7260-17.ucode",
+    "intel/ibt-hw-37.7.bseq",
+    "intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq",
+    "intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq"
+  ],
+  "microphone": "Not established; HDA output on the PCH codec is the default",
+  "notes": [
+    "HDA probes the Haswell HDMI controller first; snd_hda_intel.index=1,0 makes the PCH speaker codec card 0, which the audio policy uses.",
+    "Haswell has no Xe/ANV Vulkan support; graphics properties are pending the image audit (tools/isa_audit.py and module inventory)."
+  ]
+}

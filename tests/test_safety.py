@@ -68,4 +68,18 @@ class SafetyTests(unittest.TestCase):
         self.assertFalse(any('--delete-bootnum' in c for c in calls))
 
 
+    def test_usb_disks_are_never_sata_targets(self):
+        from googlebook import devices
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            for name,bus in [('sda','pci0000:00/0000:00:1f.2/ata1/host0/target0:0:0/0:0:0:0'),
+                             ('sdb','pci0000:00/0000:00:14.0/usb2/2-1/2-1:1.0/host6/target6:0:0/6:0:0:0'),
+                             ('nvme0n1','pci0000:00/0000:00:06.0/0000:01:00.0/nvme/nvme0')]:
+                (root/'devices'/bus/'block'/name).mkdir(parents=True)
+                (root/name).symlink_to(root/'devices'/bus/'block'/name)
+            self.assertEqual(devices.transport(root/'sda'),'sata')
+            self.assertEqual(devices.transport(root/'sdb'),'usb')
+            self.assertEqual(devices.transport(root/'nvme0n1'),'nvme')
+
+
 if __name__=='__main__':unittest.main()

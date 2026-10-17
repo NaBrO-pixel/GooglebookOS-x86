@@ -34,8 +34,9 @@ def run():
     print('Googlebook OS - Install\nChecking release files...',flush=True)
     check_manifest(stage,manifest);check_cpu(manifest.get('required_cpu_flags',[]));source=devices.find_source(stage,manifest);targets=[]
     try:
-        targets=devices.targets(source)
-        if not targets:raise ValueError('No idle, supported NVMe disk found. The source USB is protected.')
+        transports=tuple(manifest.get('install_transports',['nvme']))
+        targets=devices.targets(source,transports)
+        if not targets:raise ValueError('No idle, supported '+'/'.join(t.upper() for t in transports)+' disk found. The source USB is protected.')
         descriptions=[f'{d.path} - {d.identity["model"]} - {d.size/1024**3:.1f} GiB - ID {d.token}' for d in targets]
         if args.test_mode:
             vm=Path('/sys/class/dmi/id/product_name').read_text()
